@@ -20,6 +20,13 @@ feature -- Add tests
 			add_boolean_case (agent t1)
 			add_boolean_case (agent t2)
 			add_boolean_case (agent t3)
+			add_boolean_case (agent t4)
+			add_boolean_case (agent t5)
+			add_boolean_case (agent t6)
+			add_boolean_case (agent t7)
+			add_boolean_case (agent t8)
+			add_boolean_case (agent t9)
+			add_boolean_case (agent t10)
 		end
 
 feature -- Tests
@@ -39,6 +46,48 @@ feature -- Tests
 	t3: BOOLEAN
 		do
 			comment ("t3: comment of t3")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t4: BOOLEAN
+		do
+			comment ("t4: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t5: BOOLEAN
+		do
+			comment ("t5: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t6: BOOLEAN
+		do
+			comment ("t6: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t7: BOOLEAN
+		do
+			comment ("t7: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t8: BOOLEAN
+		do
+			comment ("t8: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t9: BOOLEAN
+		do
+			comment ("t9: comment of t1")
+			-- Add your own test on heap and scheduler.
+		end
+
+	t10: BOOLEAN
+		do
+			comment ("t10: comment of t1")
 			-- Add your own test on heap and scheduler.
 		end
 end
