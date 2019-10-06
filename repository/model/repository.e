@@ -74,40 +74,57 @@ feature -- Commands
 				not exists (k)
 		do
 			-- TODO:
+			keys.force (k)
+			data_items_1.force (d1, keys.index_of (k, 1))
+			data_items_2.extend (d2, k)
 		ensure
 			repository_count_incremented: -- TODO:
-				True
+				keys.count = old keys.count + 1
+				and data_items_1.count = old data_items_1.count + 1
+				and data_items_2.count = old data_items_2.count + 1
 
 			data_set_added: -- TODO:
 				-- Hint: At least a data set in the current repository
 				-- has its key 'k', data item 1 'd1', and data item 2 'd2'.
-				True
+				exists (k) and data_items_1[keys.index_of (k, 1)] ~ d1 and data_items_2.at (k) ~ d2
 
 			others_unchanged: -- TODO:
 				-- Hint: Each data set in the current repository,
 				-- if not the same as (`k`, `d1`, `d2`), must also exist in the old repository.
-				True
+				across 1 |..| keys.count is i all (keys.i_th (i) /~ k) implies
+					(keys.i_th (i) ~ (old keys.deep_twin).i_th (i) and
+					data_items_1[i] ~ (old data_items_1.deep_twin)[i] and
+					data_items_2.at (k) ~ (old data_items_2.deep_twin).at (k))
+				end
 		end
 
 	check_out (k: KEY)
 			-- Delete a data set with key `k` from current repository.
 		require
 			existing_key: -- TODO:
-				True
+				exists (k)
 		do
 			-- TODO:
-
+			keys.prune (k)
+			data_items_1.prune_all (data_items_1[keys.index_of (k, 1)])
+			data_items_2.remove (k)
 		ensure
 			repository_count_decremented: -- TODO:
-				True
+				keys.count = old keys.count - 1
+				and data_items_1.count = old data_items_1.count - 1
+				and data_items_2.count = old data_items_2.count - 1
 
 			key_removed: -- TODO:
-				True
+				not exists (k) and not data_items_1.valid_index (keys.index_of (k, 1)) and not data_items_2.has (k)
 
 			others_unchanged:
 				-- Hint: Each data set in the old repository,
 				-- if not with key `k`, must also exist in the curent repository.
-				True
+				across 1 |..| old keys.count is i all (old keys.deep_twin).i_th (i) /~ k implies
+					(keys.i_th (i) ~ (old keys.deep_twin).i_th (i) and
+					data_items_1[i] ~ (old data_items_1.deep_twin)[i] and
+					data_items_2.at (k) ~ (old data_items_2.deep_twin).at (k))
+				end
 		end
 
 feature -- Queries
@@ -153,7 +170,7 @@ invariant
 	unique_keys: -- TODO:
 		-- Hint: No two keys are equal to each other.
 		across 1 |..| keys.count is i all
-			across 1 |..| keys.count is j all (i /= j) implies (keys.i_th (i) /~ keys.i_th (j)) end 
+			across 1 |..| keys.count is j all (i /= j) implies (keys.i_th (i) /~ keys.i_th (j)) end
 		end
 
 	-- Do not modify the following class invariants.
