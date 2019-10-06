@@ -71,7 +71,7 @@ feature -- Commands
 			-- Insert a new data set into current repository.
 		require
 			non_existing_key: -- TODO:
-				across 1 |..| keys.count is i all keys.i_th (i) /~ k end
+				not exists (k)
 		do
 			-- TODO:
 		ensure
@@ -116,20 +116,20 @@ feature -- Queries
 			-- Number of data sets in repository.
 		do
 			-- TODO:
-
+			Result := keys.count
 		ensure
 			correct_result: -- TODO:
-				True
+				Result = keys.count and Result = data_items_1.count and Result = data_items_2.count
 		end
 
 	exists (k: KEY): BOOLEAN
 			-- Does key 'k' exist in the repository?
 		do
 			-- TODO:
-
+			Result := across 1 |..| keys.count is i some keys.i_th (i) ~ k end
 		ensure
 			correct_result: -- TODO:
-				True
+				keys.valid_index (keys.index_of (k, 1))
 		end
 
 	matching_keys (d1: DATA1; d2: DATA2): ITERABLE[KEY]
@@ -152,7 +152,9 @@ feature -- Queries
 invariant
 	unique_keys: -- TODO:
 		-- Hint: No two keys are equal to each other.
-		True
+		across 1 |..| keys.count is i all
+			across 1 |..| keys.count is j all (i /= j) implies (keys.i_th (i) /~ keys.i_th (j)) end 
+		end
 
 	-- Do not modify the following class invariants.
 	implementation_contraint:
