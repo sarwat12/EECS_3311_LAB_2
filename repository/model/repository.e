@@ -49,9 +49,12 @@ feature -- Constructor
 			-- Initialize an empty repository.
 		do
 			-- TODO:
+			create keys.make
+			create data_items_1.make_empty
+			create data_items_2.make (1)
 		ensure
 			empty_repository: -- TODO:
-				True
+				keys.count = 0 and data_items_1.count = 0 and data_items_2.count = 0
 
 			-- Do not modify the following three postconditions.
 			object_equality_for_keys:
@@ -68,7 +71,7 @@ feature -- Commands
 			-- Insert a new data set into current repository.
 		require
 			non_existing_key: -- TODO:
-				True
+				across 1 |..| keys.count is i all keys.i_th (i) /~ k end
 		do
 			-- TODO:
 		ensure
@@ -133,7 +136,7 @@ feature -- Queries
 			-- Keys that are associated with data items 'd1' and 'd2'.
 		do
 			-- TODO:
-
+			Result := keys.new_cursor
 		ensure
 			result_contains_correct_keys_only: -- TODO:
 				-- Hint: Each key in Result has its associated data items 'd1' and 'd2'.
