@@ -42,8 +42,11 @@ feature -- feature(s) required by ITERABLE
 	-- As soon as you make the current class iterable,
 	-- define the necessary feature(s) here.
 	new_cursor: ITERATION_CURSOR[TUPLE[DATA1, DATA2, KEY]]
+	local
+		cursor: TUPLE_ITERATION_CURSOR[KEY, DATA1, DATA2]
 	do
-		create {TUPLE_ITERATION_CURSOR[KEY, DATA1, DATA2]} Result.make
+		create cursor.make(data_items_1, data_items_2, keys)
+		Result := cursor
 	end
 
 feature -- alternative iteration cursor
@@ -51,8 +54,11 @@ feature -- alternative iteration cursor
 	-- See test_another_cursor in EXAMPLE_REPOSITORY_TESTS.
 	-- A feature 'another_cursor' is expected to be defined here.
 	another_cursor: ITERATION_CURSOR[DATA_SET[DATA1, DATA2, KEY]]
+	local
+		cursor: DATA_SET_ITERATION_CURSOR[DATA1, DATA2, KEY]
 	do
-		create {DATA_SET_ITERATION_CURSOR[DATA1, DATA2, KEY]} Result.make
+		create cursor.make(data_items_1, data_items_2, keys)
+		Result := cursor
 	end
 
 feature -- Constructor
@@ -162,19 +168,37 @@ feature -- Queries
 
 	matching_keys (d1: DATA1; d2: DATA2): ITERABLE[KEY]
 			-- Keys that are associated with data items 'd1' and 'd2'.
+		local
+			temp: ARRAY[KEY]
 		do
 			-- TODO:
-			Result := keys.new_cursor
+			create temp.make_empty
+			across 1 |..| data_items_1.count is i loop
+				if data_items_1[i] ~ d1 then
+					temp.force (keys.i_th (i), temp.count + 1)
+				end
+			end
+			across 1 |..| data_items_2.count is i loop
+				if data_items_2.iteration_item (i) ~ d2 then
+					temp.force (data_items_2.key_for_iteration, temp.count + 1)
+				end
+			end
+			Result := temp
 		ensure
 			result_contains_correct_keys_only: -- TODO:
 				-- Hint: Each key in Result has its associated data items 'd1' and 'd2'.
-				True
+				across Result as i all
+					i.item ~ data_items_1[keys.index_of (i.item, 1)]
+				end
 
 			correct_keys_are_in_result: -- TODO:
 				-- Hint: Each data set with data items 'd1' and 'd2' has its key included in Result.
 				-- Notice that Result is ITERABLE and does not support the feature 'has',
 				-- Use the appropriate across expression instead.
-				True
+				across Result as i all
+					data_items_1[keys.index_of (i.item, 1)] ~ d1 and
+					data_items_2.at (i.item) ~ d2
+				end
 		end
 
 invariant
