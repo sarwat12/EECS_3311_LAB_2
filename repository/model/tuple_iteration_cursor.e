@@ -19,7 +19,7 @@ feature
 		d1:= item1
 		d2 := item2
 		key := k
-		cursor_position := key.lower
+		cursor_position := d1.lower
 	end
 
 feature {NONE}
@@ -48,7 +48,7 @@ feature
 
 	after: BOOLEAN
 	do
-		Result := key.after
+		Result := cursor_position > d1.upper
 	end
 
 	forth
