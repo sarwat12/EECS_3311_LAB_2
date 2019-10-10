@@ -10,10 +10,10 @@ class
 inherit
 	ITERATION_CURSOR[TUPLE[DATA1, DATA2, KEY]]
 
-create
+create --Constructor
 	make
 
-feature
+feature  --Constructor Implementation
 	make(item1: ARRAY[DATA1]; item2: HASH_TABLE[DATA2, KEY]; k: LINKED_LIST[KEY])
 	do
 		d1:= item1
@@ -22,13 +22,13 @@ feature
 		cursor_position := d1.lower
 	end
 
-feature {NONE}
+feature {NONE} --Private Features
 	cursor_position: INTEGER
 	d1: ARRAY[DATA1]
 	d2: HASH_TABLE[DATA2, KEY]
 	key: LINKED_LIST[KEY]
 
-feature
+feature --Implementing deffered features
 	item: TUPLE[DATA1, DATA2, KEY]
 	local
 		dat1: DATA1

@@ -111,12 +111,11 @@ feature -- Commands
 			others_unchanged: -- TODO:
 				-- Hint: Each data set in the current repository,
 				-- if not the same as (`k`, `d1`, `d2`), must also exist in the old repository.
---				across 1 |..| keys.count is i all (keys.i_th (i) /~ k) implies
---					(keys.i_th (i) ~ (old keys.deep_twin).i_th (i) and
---					data_items_1[i] ~ (old data_items_1.deep_twin)[i] and
---					data_items_2.at (k) ~ (old data_items_2.deep_twin).at (k))
---				end
-				TRUE
+				across 1 |..| keys.count is i all (keys.i_th (i) /~ k) implies
+					(keys.i_th (i) ~ (old keys.deep_twin).i_th (i) and
+					data_items_1[i] ~ (old data_items_1.deep_twin)[i] and
+					data_items_2.at (keys.i_th (i)) ~ (old data_items_2.deep_twin).at (keys.i_th (i)))
+				end
 		end
 
 	check_out (k: KEY)
@@ -146,20 +145,18 @@ feature -- Commands
 				and data_items_2.count = old data_items_2.count - 1
 
 			key_removed: -- TODO:
---				not exists (k) and
---				not data_items_1.valid_index (keys.index_of (k, 1)) and
---				not data_items_2.has (k)
-				TRUE
+				not exists (k) and
+				not data_items_1.valid_index (keys.index_of (k, 1)) and
+				not data_items_2.has (k)
 
 			others_unchanged:
 				-- Hint: Each data set in the old repository,
 				-- if not with key `k`, must also exist in the curent repository.
---				across 1 |..| old keys.count is i all (old keys.deep_twin).i_th (i) /~ k implies
---					(keys.i_th (i) ~ (old keys.deep_twin).i_th (i) and
---					data_items_1[i] ~ (old data_items_1.deep_twin)[i] and
---					data_items_2.at (k) ~ (old data_items_2.deep_twin).at (k))
---				end
-				TRUE
+				across keys as j all
+				(old keys.deep_twin).has(j.item) and
+				(old data_items_1.deep_twin).has (data_items_1.at (keys.index_of (j.item, 1))) and
+				(old data_items_2.deep_twin).item (j.item) ~ data_items_2.item (j.item)
+				end
 		end
 
 feature -- Queries
@@ -181,7 +178,7 @@ feature -- Queries
 			Result := across 1 |..| keys.count is i some keys.i_th (i) ~ k end
 		ensure
 			correct_result: -- TODO:
-				keys.valid_index (keys.index_of (k, 1))
+				keys.has (k)
 		end
 
 	matching_keys (d1: DATA1; d2: DATA2): ITERABLE[KEY]
@@ -196,29 +193,25 @@ feature -- Queries
 					temp.force (keys.i_th (i), temp.count + 1)
 				end
 			end
-			across 1 |..| data_items_2.count is i loop
-				if data_items_2.iteration_item (i) ~ d2 then
-					temp.force (data_items_2.key_for_iteration, temp.count + 1)
-				end
-			end
 			Result := temp
 		ensure
 			result_contains_correct_keys_only: -- TODO:
 				-- Hint: Each key in Result has its associated data items 'd1' and 'd2'.
---				across Result as i all
---					i.item ~ data_items_1[keys.index_of (i.item, 1)]
---				end
-				TRUE
+				across Result as i all
+					data_items_1.at (keys.index_of (i.item, 1)) ~ d1 and
+					data_items_2.at (i.item) ~ d2
+				end
 
 			correct_keys_are_in_result: -- TODO:
 				-- Hint: Each data set with data items 'd1' and 'd2' has its key included in Result.
 				-- Notice that Result is ITERABLE and does not support the feature 'has',
 				-- Use the appropriate across expression instead.
---				across Result as i all
---					data_items_1[keys.index_of (i.item, 1)] ~ d1 and
---					data_items_2.at (i.item) ~ d2
---				end
-				TRUE
+				across 1 |..| data_items_1.count is i some
+				across Result as j all
+				(data_items_1.at (i) ~ d1) implies (keys.i_th (i) ~ j.item) and
+				(data_items_2.at (keys.i_th (i)) ~ d2)
+				end
+				end
 		end
 
 invariant
